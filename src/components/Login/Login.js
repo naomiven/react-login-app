@@ -16,9 +16,25 @@ const Login = (props) => {
   // One code in one place instead of (before) in multiple places.
   // useEffect should be executed in response to something (eg., side effect)
   useEffect(() => {
-    setFormIsValid(
-      enteredEmail.includes('@') && enteredPassword.trim().length > 6
-    );
+    // console.log('Checking for validity on every keystroke!');
+
+    // Debounce - Don't keep doing something on every keystroke, but only
+    // when the user made a pause (eg., every 500ms)
+    const identifier = setTimeout(() => {
+      console.log('Checking for validity after 500ms!');
+      setFormIsValid(
+        enteredEmail.includes('@') && enteredPassword.trim().length > 6
+      );
+    }, 500);
+
+    // Before the useEffect fcn runs (except 1st time) this cleanup fcn
+    // will run. Everytime this runs, we clear the previous timer, so we
+    // always end up with the latest timer which will only run once. A
+    // typical use case is sending HTTP requests only once per timeout.
+    return () => {
+      console.log('CLEANUP');
+      clearTimeout(identifier);
+    };
   }, [enteredEmail, enteredPassword]);
 
   const emailChangeHandler = (event) => {
