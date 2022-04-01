@@ -1,52 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 
 import Card from '../UI/Card/Card';
 import classes from './Login.module.css';
 import Button from '../UI/Button/Button';
 
+const emailReducer = (state, action) => {
+  if (action.type === 'USER_INPUT') {
+    return { value: action.val, isValid: action.val.includes('@') };
+  } else if (action.type === 'INPUT_BLUR') {
+    // state is guaranteed to have the last value entered for email
+    return { value: state.value, isValid: state.value.includes('@') };
+  }
+  return { value: '', isValid: false };
+};
+
 const Login = (props) => {
-  const [enteredEmail, setEnteredEmail] = useState('');
-  const [emailIsValid, setEmailIsValid] = useState();
+  // const [enteredEmail, setEnteredEmail] = useState('');
+  // const [emailIsValid, setEmailIsValid] = useState();
   const [enteredPassword, setEnteredPassword] = useState('');
   const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
-  // After every component execution, React reruns this function only if
-  // either enteredEmail or enteredPassword changed.
-  // One code in one place instead of (before) in multiple places.
-  // useEffect should be executed in response to something (eg., side effect)
-  useEffect(() => {
-    // console.log('Checking for validity on every keystroke!');
+  // Merge email value and validity into one state via useReducer
+  const [emailState, dispatchEmail] = useReducer(emailReducer, {
+    value: '',
+    isValid: false,
+  });
 
-    // Debounce - Don't keep doing something on every keystroke, but only
-    // when the user made a pause (eg., every 500ms)
-    const identifier = setTimeout(() => {
-      console.log('Checking for validity after 500ms!');
-      setFormIsValid(
-        enteredEmail.includes('@') && enteredPassword.trim().length > 6
-      );
-    }, 500);
+  /*
+  After every component execution, React reruns this function only if
+  either enteredEmail or enteredPassword changed.
+  One code in one place instead of (before) in multiple places.
+  useEffect should be executed in response to something (eg., side effect)
+  */
 
-    // Before the useEffect fcn runs (except 1st time) this cleanup fcn
-    // will run. Everytime this runs, we clear the previous timer, so we
-    // always end up with the latest timer which will only run once. A
-    // typical use case is sending HTTP requests only once per timeout.
-    return () => {
-      console.log('CLEANUP');
-      clearTimeout(identifier);
-    };
-  }, [enteredEmail, enteredPassword]);
+  // useEffect(() => {
+  //   /*
+  //   console.log('Checking for validity on every keystroke!');
+
+  //   Debounce - Don't keep doing something on every keystroke, but only
+  //   when the user made a pause (eg., every 500ms)
+  //   */
+  //   const identifier = setTimeout(() => {
+  //     console.log('Checking for validity after 500ms!');
+  //     setFormIsValid(
+  //       enteredEmail.includes('@') && enteredPassword.trim().length > 6
+  //     );
+  //   }, 500);
+
+  //   /*
+  //   Before the useEffect fcn runs (except 1st time) this cleanup fcn
+  //   will run. Everytime this runs, we clear the previous timer, so we
+  //   always end up with the latest timer which will only run once. A
+  //   typical use case is sending HTTP requests only once per timeout.
+  //   */
+  //   return () => {
+  //     console.log('CLEANUP');
+  //     clearTimeout(identifier);
+  //   };
+  // }, [enteredEmail, enteredPassword]);
 
   const emailChangeHandler = (event) => {
-    setEnteredEmail(event.target.value);
+    // for useState
+    // setEnteredEmail(event.target.value);
+
+    // for useReducer
+    dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
+    setFormIsValid(
+      event.target.value.includes('@') && event.target.value.trim().length > 6
+    );
   };
 
   const passwordChangeHandler = (event) => {
     setEnteredPassword(event.target.value);
+    setFormIsValid(emailState.isValid && event.target.value.trim().length > 6);
   };
 
   const validateEmailHandler = () => {
-    setEmailIsValid(enteredEmail.includes('@'));
+    // for useReducer
+    dispatchEmail({ type: 'INPUT_BLUR' });
   };
 
   const validatePasswordHandler = () => {
@@ -55,7 +87,11 @@ const Login = (props) => {
 
   const submitHandler = (event) => {
     event.preventDefault();
-    props.onLogin(enteredEmail, enteredPassword);
+    // for useState
+    // props.onLogin(enteredEmail, enteredPassword);
+
+    // for useReducer
+    props.onLogin(emailState.value, enteredPassword);
   };
 
   return (
@@ -63,14 +99,14 @@ const Login = (props) => {
       <form onSubmit={submitHandler}>
         <div
           className={`${classes.control} ${
-            emailIsValid === false ? classes.invalid : ''
+            emailState.isValid === false ? classes.invalid : ''
           }`}
         >
           <label htmlFor='email'>E-Mail</label>
           <input
             type='email'
             id='email'
-            value={enteredEmail}
+            value={emailState.value}
             onChange={emailChangeHandler}
             onBlur={validateEmailHandler}
           />
