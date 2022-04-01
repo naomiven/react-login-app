@@ -14,15 +14,30 @@ const emailReducer = (state, action) => {
   return { value: '', isValid: false };
 };
 
+const passwordReducer = (state, action) => {
+  if (action.type === 'USER_INPUT') {
+    return { value: action.val, isValid: action.val.trim().length > 6 };
+  } else if (action.type === 'INPUT_BLUR') {
+    return { value: state.value, isValid: state.value.trim().length > 6 };
+  }
+  return { value: '', isValid: false };
+};
+
 const Login = (props) => {
+  // for useState
   // const [enteredEmail, setEnteredEmail] = useState('');
   // const [emailIsValid, setEmailIsValid] = useState();
-  const [enteredPassword, setEnteredPassword] = useState('');
-  const [passwordIsValid, setPasswordIsValid] = useState();
+  // const [enteredPassword, setEnteredPassword] = useState('');
+  // const [passwordIsValid, setPasswordIsValid] = useState();
   const [formIsValid, setFormIsValid] = useState(false);
 
   // Merge email value and validity into one state via useReducer
   const [emailState, dispatchEmail] = useReducer(emailReducer, {
+    value: '',
+    isValid: false,
+  });
+
+  const [passwordState, dispatchPassword] = useReducer(passwordReducer, {
     value: '',
     isValid: false,
   });
@@ -66,14 +81,16 @@ const Login = (props) => {
 
     // for useReducer
     dispatchEmail({ type: 'USER_INPUT', val: event.target.value });
-    setFormIsValid(
-      event.target.value.includes('@') && event.target.value.trim().length > 6
-    );
+    setFormIsValid(emailState.isValid && passwordState.isValid);
   };
 
   const passwordChangeHandler = (event) => {
-    setEnteredPassword(event.target.value);
-    setFormIsValid(emailState.isValid && event.target.value.trim().length > 6);
+    // for useState
+    // setEnteredPassword(event.target.value);
+
+    // for useReducer
+    dispatchPassword({ type: 'USER_INPUT', val: event.target.value });
+    setFormIsValid(emailState.isValid && passwordState.isValid);
   };
 
   const validateEmailHandler = () => {
@@ -82,7 +99,10 @@ const Login = (props) => {
   };
 
   const validatePasswordHandler = () => {
-    setPasswordIsValid(enteredPassword.trim().length > 6);
+    // for useState
+    // setPasswordIsValid(enteredPassword.trim().length > 6);
+
+    dispatchPassword({ type: 'INPUT_BLUR' });
   };
 
   const submitHandler = (event) => {
@@ -91,7 +111,7 @@ const Login = (props) => {
     // props.onLogin(enteredEmail, enteredPassword);
 
     // for useReducer
-    props.onLogin(emailState.value, enteredPassword);
+    props.onLogin(emailState.value, passwordState.value);
   };
 
   return (
@@ -113,14 +133,14 @@ const Login = (props) => {
         </div>
         <div
           className={`${classes.control} ${
-            passwordIsValid === false ? classes.invalid : ''
+            passwordState.isValid === false ? classes.invalid : ''
           }`}
         >
           <label htmlFor='password'>Password</label>
           <input
             type='password'
             id='password'
-            value={enteredPassword}
+            value={passwordState.value}
             onChange={passwordChangeHandler}
             onBlur={validatePasswordHandler}
           />
