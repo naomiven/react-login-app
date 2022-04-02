@@ -43,37 +43,42 @@ const Login = (props) => {
   });
 
   /*
+  Assign alias - pull out isValid property and store it in emailIsValid
+  Need to do this st. setFormIsValid() will only run if these changes
+  */
+  const { isValid: emailIsValid } = emailState;
+  const { isValid: passwordIsValid } = passwordState;
+
+  /*
   After every component execution, React reruns this function only if
   either enteredEmail or enteredPassword changed.
   One code in one place instead of (before) in multiple places.
   useEffect should be executed in response to something (eg., side effect)
   */
 
-  // useEffect(() => {
-  //   /*
-  //   console.log('Checking for validity on every keystroke!');
+  useEffect(() => {
+    /*
+    console.log('Checking for validity on every keystroke!');
 
-  //   Debounce - Don't keep doing something on every keystroke, but only
-  //   when the user made a pause (eg., every 500ms)
-  //   */
-  //   const identifier = setTimeout(() => {
-  //     console.log('Checking for validity after 500ms!');
-  //     setFormIsValid(
-  //       enteredEmail.includes('@') && enteredPassword.trim().length > 6
-  //     );
-  //   }, 500);
+    Debounce - Don't keep doing something on every keystroke, but only
+    when the user made a pause (eg., every 500ms)
+    */
+    const identifier = setTimeout(() => {
+      console.log('Checking for validity after 500ms!');
+      setFormIsValid(emailIsValid && passwordIsValid);
+    }, 500);
 
-  //   /*
-  //   Before the useEffect fcn runs (except 1st time) this cleanup fcn
-  //   will run. Everytime this runs, we clear the previous timer, so we
-  //   always end up with the latest timer which will only run once. A
-  //   typical use case is sending HTTP requests only once per timeout.
-  //   */
-  //   return () => {
-  //     console.log('CLEANUP');
-  //     clearTimeout(identifier);
-  //   };
-  // }, [enteredEmail, enteredPassword]);
+    /*
+    Before the useEffect fcn runs (except 1st time) this cleanup fcn
+    will run. Everytime this runs, we clear the previous timer, so we
+    always end up with the latest timer which will only run once. A
+    typical use case is sending HTTP requests only once per timeout.
+    */
+    return () => {
+      console.log('CLEANUP');
+      clearTimeout(identifier);
+    };
+  }, [emailIsValid, passwordIsValid]);
 
   const emailChangeHandler = (event) => {
     // for useState
@@ -90,7 +95,7 @@ const Login = (props) => {
 
     // for useReducer
     dispatchPassword({ type: 'USER_INPUT', val: event.target.value });
-    setFormIsValid(emailState.isValid && passwordState.isValid);
+    // setFormIsValid(emailState.isValid && passwordState.isValid);
   };
 
   const validateEmailHandler = () => {
