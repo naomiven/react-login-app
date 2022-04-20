@@ -19,4 +19,8 @@ Small app to practice more React hooks: `useEffect`, `useReducer`, `useContext`
   `isLoggedIn` state and `onLogout` handler.
 - **NOT** optimized for high frequency changes
 
-_Note that `props` should be used for configuring components, but `useContext` should be used for state management and is also a good replacement for long `prop chains`._
+## When to use props vs Context
+
+`props` should be used for configuring reusable components. Eg., components like `Button` and `Input` should be configurable with different values.
+
+`useContext` should be used for state management. It is a good replacement for long `prop chains`. All components that have this will be bound to the context and will contain the same values. Therefore it is less reusable.
