@@ -5,7 +5,7 @@ Small app to practice more React hooks: `useEffect`, `useReducer`, `useContext`
 ## useEffect
 
 - Executes a function in response to something (eg., side effect).
-- After every component execution, this function will rerun only if dependencies change (prevents infinite loop).
+- After every component render cycle, the function passed will rerun only if dependencies change (prevents infinite loop). If no dependency, eg., `[]`, the function will run after the first render cycle.
 - Use this as an alternative to `useState`.
 
 ## useReducer
@@ -18,6 +18,10 @@ Small app to practice more React hooks: `useEffect`, `useReducer`, `useContext`
 - No need to pass in data through the parent/child tree via `props`. Eg.
   `isLoggedIn` state and `onLogout` handler.
 - **NOT** optimized for high frequency changes
+
+## useImperativeHandle
+
+- When used in conjuction with `forwardRef`, functionalities are exposed from a React component to its parent component through refs in order to trigger these functionalities from the parent.
 
 ## When to use props vs Context
 
