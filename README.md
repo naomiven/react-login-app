@@ -2,6 +2,15 @@
 
 Small app to practice more React hooks: `useEffect`, `useReducer`, `useContext`
 
+Built with:
+
+```sh
+npm -v
+8.1.2
+node -v
+v16.13.1
+```
+
 ## useEffect
 
 - Executes a function in response to something (eg., side effect).
